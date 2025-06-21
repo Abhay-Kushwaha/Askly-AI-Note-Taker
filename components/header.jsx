@@ -1,14 +1,13 @@
 import React from "react";
 import { Button } from "./ui/button";
 import {
-  LayoutDashboard,
-  FileSearch,
-  Bot,
-  ListChecks,
-  FileText,
   PenBox,
+  LayoutDashboard,
+  FileText,
+  GraduationCap,
   ChevronDown,
   StarsIcon,
+  ListChecks,
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
@@ -34,11 +33,11 @@ export default async function Header() {
             alt="Askly Logo"
             width={160}
             height={50}
-            className="h-12 w-auto px-5 object-contain"
+            className="h-12 w-auto object-contain px-5"
           />
         </Link>
 
-        {/* Navigation */}
+        {/* Navigation Actions */}
         <div className="flex items-center space-x-2 md:space-x-4">
           <SignedIn>
             {/* Dashboard */}
@@ -66,40 +65,28 @@ export default async function Header() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem asChild>
-                  <Link href="/pdf-analyzer" className="flex items-center gap-2">
-                    <FileSearch className="h-4 w-4" />
-                    Analyze PDF
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/chatbot" className="flex items-center gap-2">
-                    <Bot className="h-4 w-4" />
-                    AI Chatbot
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/quiz" className="flex items-center gap-2">
-                    <ListChecks className="h-4 w-4" />
-                    Take Quiz
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link href="/resume" className="flex items-center gap-2">
                     <FileText className="h-4 w-4" />
                     Build Resume
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/cover-letter" className="flex items-center gap-2">
+                  <Link href="/ai-cover-letter" className="flex items-center gap-2">
                     <PenBox className="h-4 w-4" />
                     Cover Letter
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/quiz" className="flex items-center gap-2">
+                    <ListChecks className="h-4 w-4" />
+                    Interactive Quizzes
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SignedIn>
 
-          {/* Sign In/Out & Profile */}
+          {/* Auth */}
           <SignedOut>
             <SignInButton>
               <Button variant="outline">Sign In</Button>
