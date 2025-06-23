@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { generateQuiz, saveQuizResult } from "@/actions/interview";
+import { generateQuiz, saveQuizResult } from "@/actions/quiz";
 import QuizResult from "./quiz-result";
 import useFetch from "@/hooks/use-fetch";
 import { BarLoader } from "react-spinners";
@@ -105,7 +105,7 @@ export default function Quiz() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            This quiz contains 10 questions specific to your industry and
+            This quiz contains 10 questions specific to your PDF Topics and
             skills. Take your time and choose the best answer for each question.
           </p>
         </CardContent>
