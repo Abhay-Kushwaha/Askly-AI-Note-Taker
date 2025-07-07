@@ -1,24 +1,23 @@
 # 🤖 Askly – AI-Powered Learning Companion
-An intelligent learning assistant that helps students understand notes, ask questions, generate quizzes, and even build resumes & cover letters. Built using modern frameworks like **Next.js**, **Tailwind CSS**, **Prisma**, **Neon DB**, **ShadCN UI**, and **Generative AI** for a seamless, powerful academic experience.
-> Transform the way you study – summarize PDFs, chat with your notes, assess your learning, and prepare for your future. 🚀📖
+An intelligent learning assistant that helps students understand notes, ask questions, generate quizzes, and even build resumes & cover letters. Built using modern frameworks like **Next.js**, **Tailwind CSS**, **Drizzle ORM**, **Neon DB**, **ShadCN UI**, and **Generative AI** for a seamless, powerful academic experience.
+> Transform the way you study – summarize PDFs, chat with your notes, assess your learning, and prepare for your future. 🚀
 
 ## 🛠️ Tech Stack
-| Layer       | Technologies                                                                 |
-|-------------|-------------------------------------------------------------------------------|
-| **Frontend**| Next.js 15, React 19, Tailwind CSS 3.4, ShadCN UI, Radix UI, Lucide Icons     |
-| **Backend** | Next.js API Routes, Prisma ORM, Inngest (background jobs/workflows)           |
-| **Database**| Neon DB (PostgreSQL)                                                          |
-| **AI/ML**   | Google Generative AI (`@google/generative-ai`)                                |
-| **Auth**    | Clerk.dev (`@clerk/nextjs`)                                                   |
-| **Forms**   | React Hook Form + Zod + @hookform/resolvers                                   |
-| **UI/UX**   | ShadCN, Radix UI, Tailwind Merge, Tailwind Animations
+| Layer           | Technologies & Frameworks                                                                                 |
+|----------------|------------------------------------------------------------------------------------------------------------|
+| **Frontend**   | **Next.js** – React framework for SSR/SSG & routing <br>**TypeScript** – Typed JavaScript <br>**Tailwind CSS** – Utility-first CSS <br>**ShadCN UI** – Accessible UI components <br>**Radix UI** – Primitives for building UI <br>**Lucide Icons** – Icon library <br>**tailwind-merge** – Utility for merging Tailwind classes |
+| **Backend**    | **Next.js API Routes** – Serverless backend <br>**Drizzle ORM** – Type-safe SQL ORM <br>**Drizzle-kit** – Drizzle migration tool <br>**Drizzle-orm/neon-http** – Drizzle adapter for Neon <br>**Axios** – Promise-based HTTP client |
+| **Database**   | **Neon Database Serverless** – Serverless PostgreSQL <br>**PostgreSQL** – Relational database <br>**Pinecone** – Vector database for AI/semantic search |
+| **AI/ML**      | **OpenAI API** – Generative AI <br>**OpenAI Edge** – Edge-optimized OpenAI API <br>**Google Generative AI** – Google’s AI models |
+| **Auth**       | **Clerk** / **@clerk/nextjs** – Authentication & user management |
+| **Cloud/Infra**| **AWS SDK** – AWS cloud services integration |
 
 ## 🚀 Getting Started
 
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/Abhay-Kushwaha/Askly-AI-Note-Taker
-cd askly
+cd Askly-AI-Note-Taker
 ```
 
 ### 2. Install dependencies
@@ -39,13 +38,7 @@ NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding
 NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
 ```
 
-### 4. Setup Prisma
-```bash
-npx prisma generate
-npx prisma migrate dev --name init
-```
-
-### 5. Run the development server
+### 4. Run the development server
 ```bash
 npm run dev
 ```
@@ -60,12 +53,3 @@ npm run dev
 - 📄 Download content summaries and results as PDF
 - 🧪 Form validation powered by Zod
 - 🧵 Background workflows powered by Inngest
-
-## 🧪 Scripts
-| Script         | Description                     |
-|----------------|---------------------------------|
-| `dev`          | Run the dev server (Turbo)      |
-| `build`        | Build for production            |
-| `start`        | Start production server         |
-| `lint`         | Lint the codebase               |
-| `postinstall`  | Run
