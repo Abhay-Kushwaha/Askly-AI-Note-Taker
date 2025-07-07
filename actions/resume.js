@@ -1,6 +1,8 @@
 "use server";
 
-import { db } from "@/lib/prisma";
+import { db } from "@/lib/index";
+import { users, resumes } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { revalidatePath } from "next/cache";
@@ -12,26 +14,41 @@ export async function saveResume(content) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
+  // Find user by clerkUserId
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkUserId, userId))
+    .then((res) => res[0]);
   if (!user) throw new Error("User not found");
 
   try {
-    const resume = await db.resume.upsert({
-      where: {
-        userId: user.id,
-      },
-      update: {
-        content,
-      },
-      create: {
-        userId: user.id,
-        content,
-      },
-    });
-
+    // Check if resume exists
+    const existing = await db
+      .select()
+      .from(resumes)
+      .where(eq(resumes.userId, user.id))
+      .then((res) => res[0]);
+    let resume;
+    if (existing) {
+      // Update
+      [resume] = await db
+        .update(resumes)
+        .set({ content, updatedAt: new Date() })
+        .where(eq(resumes.userId, user.id))
+        .returning();
+    } else {
+      // Insert
+      [resume] = await db
+        .insert(resumes)
+        .values({
+          userId: user.id,
+          content,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .returning();
+    }
     revalidatePath("/resume");
     return resume;
   } catch (error) {
@@ -44,30 +61,31 @@ export async function getResume() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
+  // Find user by clerkUserId
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkUserId, userId))
+    .then((res) => res[0]);
   if (!user) throw new Error("User not found");
 
-  return await db.resume.findUnique({
-    where: {
-      userId: user.id,
-    },
-  });
+  return await db
+    .select()
+    .from(resumes)
+    .where(eq(resumes.userId, user.id))
+    .then((res) => res[0]);
 }
 
 export async function improveWithAI({ current, type }) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    include: {
-      industryInsight: true,
-    },
-  });
-
+  // Find user by clerkUserId
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.clerkUserId, userId))
+    .then((res) => res[0]);
   if (!user) throw new Error("User not found");
 
   const prompt = `
