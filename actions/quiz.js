@@ -1,6 +1,8 @@
 "use server";
 
-import { db } from "@/lib/prisma";
+import { db } from "@/lib/index";
+import { users, assessments } from "@/lib/schema";
+import { eq, desc, asc } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -10,28 +12,25 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 export async function generateQuiz() {
 
   console.log("ENVIRONMENT VARIABLES:", {
-    GEMINI_API_KEY: process.env.GEMINI_API_KEY,}
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
+  }
   );
 
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-    select: {
-      industry: true,
-      skills: true,
-    },
-  });
+  // Find user by clerkUserId
+  const user = await db.select({ industry: users.industry, skills: users.skills })
+    .from(users)
+    .where(eq(users.clerkUserId, userId))
+    .then(res => res[0]);
 
   if (!user) throw new Error("User not found");
 
   const prompt = `
-    Generate 10 technical interview questions for a ${
-      user.industry
-    } professional${
-    user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
-  }.
+    Generate 10 technical interview questions for a ${user.industry
+    } professional${user.skills?.length ? ` with expertise in ${user.skills.join(", ")}` : ""
+    }.
     
     Each question should be multiple choice with 4 options.
     
@@ -66,10 +65,8 @@ export async function saveQuizResult(questions, answers, score) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
+  // Find user by clerkUserId
+  const user = await db.select().from(users).where(eq(users.clerkUserId, userId)).then(res => res[0]);
   if (!user) throw new Error("User not found");
 
   const questionResults = questions.map((q, index) => ({
@@ -116,16 +113,15 @@ export async function saveQuizResult(questions, answers, score) {
   }
 
   try {
-    const assessment = await db.assessment.create({
-      data: {
-        userId: user.id,
-        quizScore: score,
-        questions: questionResults,
-        category: "Technical",
-        improvementTip,
-      },
-    });
-
+    const [assessment] = await db.insert(assessments).values({
+      userId: user.id,
+      quizScore: score,
+      questions: questionResults,
+      category: "Technical",
+      improvementTip,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }).returning();
     return assessment;
   } catch (error) {
     console.error("Error saving quiz result:", error);
@@ -137,23 +133,14 @@ export async function getAssessments() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
+  // Find user by clerkUserId
+  const user = await db.select().from(users).where(eq(users.clerkUserId, userId)).then(res => res[0]);
   if (!user) throw new Error("User not found");
 
   try {
-    const assessments = await db.assessment.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
-
-    return assessments;
+    return await db.select().from(assessments)
+      .where(eq(assessments.userId, user.id))
+      .orderBy(asc(assessments.createdAt));
   } catch (error) {
     console.error("Error fetching assessments:", error);
     throw new Error("Failed to fetch assessments");

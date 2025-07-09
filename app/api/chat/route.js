@@ -1,81 +1,73 @@
+import { Configuration, OpenAIApi } from "openai-edge";
+import { Message, OpenAIStream, StreamingTextResponse } from "ai";
+import { getContext } from "@/lib/context";
+import { db } from "@/lib/index";
+import { chats, messages as _messages } from "@/lib/schema";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { googleAI } from "@/lib/google-ai-upload";
-import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
 
-function errorResponse(message, status = 400) {
-  return NextResponse.json({ error: message }, { status });
-}
+export const runtime = "edge";
+
+const config = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(config);
 
 export async function POST(req) {
-  try {
-    const userId = "7400e09b-2d48-42d3-8530-4f35e7aedabe";
-    if (!userId) return errorResponse("Unauthorized", 401);
+    try {
+        const { messages, chatId } = await req.json();
+        const _chats = await db.select().from(chats).where(eq(chats.id, chatId));
+        if (_chats.length != 1) {
+            return NextResponse.json({ error: "chat not found" }, { status: 404 });
+        }
+        const fileKey = _chats[0].fileKey;
+        const lastMessage = messages[messages.length - 1];
+        const context = await getContext(lastMessage.content, fileKey);
 
-    const body = await req.json();
-    const { question, uploadId } = body;
+        const prompt = {
+            role: "system",
+            content: `AI assistant is a brand new, powerful, human-like artificial intelligence.
+      The traits of AI include expert knowledge, helpfulness, cleverness, and articulateness.
+      AI is a well-behaved and well-mannered individual.
+      AI is always friendly, kind, and inspiring, and he is eager to provide vivid and thoughtful responses to the user.
+      AI has the sum of all knowledge in their brain, and is able to accurately answer nearly any question about any topic in conversation.
+      AI assistant is a big fan of Pinecone and Vercel.
+      START CONTEXT BLOCK
+      ${context}
+      END OF CONTEXT BLOCK
+      AI assistant will take into account any CONTEXT BLOCK that is provided in a conversation.
+      If the context does not provide the answer to question, the AI assistant will say, "I'm sorry, but I don't know the answer to that question".
+      AI assistant will not apologize for previous responses, but instead will indicated new information was gained.
+      AI assistant will not invent anything that is not drawn directly from the context.
+      `,
+        };
 
-    if (!question || !uploadId) return errorResponse("Question and uploadId required");
-
-    // 1. Fetch upload content to use as context
-    const upload = await db.upload.findUnique({
-      where: { id: uploadId },
-      select: { content: true },
-    });
-
-    if (!upload) return errorResponse("Upload not found", 404);
-
-    // 2. Ask question using upload content as context
-    const answer = await googleAI.askQuestion({
-      question,
-      context: upload.content,
-    });
-
-    if (!answer) return errorResponse("AI failed to generate answer", 500);
-
-    // 3. Store chat
-    const chat = await db.chat.create({
-      data: {
-        userId,
-        question,
-        answer,
-        uploadId,
-      },
-    });
-
-    return NextResponse.json({ answer, chat });
-
-  } catch (err) {
-    console.error("Chat error:", err);
-    return errorResponse("Internal server error", 500);
-  }
-}
-
-export async function GET(req) {
-  try {
-    const userId = "7400e09b-2d48-42d3-8530-4f35e7aedabe"; // TODO: Replace with real auth
-    
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const chats = await db.chat.findMany({
-      where: { userId },
-      include: {
-        upload: {
-          select: { filename: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return NextResponse.json({ chats });
-
-  } catch (error) {
-    console.error("Get chats error:", error.message);
-    return NextResponse.json({ 
-      error: "Internal server error", 
-      details: error.message 
-    }, { status: 500 });
-  }
+        const response = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: [
+                prompt,
+                ...messages.filter((message) => message.role === "user"),
+            ],
+            stream: true,
+        });
+        const stream = OpenAIStream(response, {
+            onStart: async () => {
+                // save user message into db
+                await db.insert(_messages).values({
+                    chatId,
+                    content: lastMessage.content,
+                    role: "user",
+                });
+            },
+            onCompletion: async (completion) => {
+                // save ai message into db
+                await db.insert(_messages).values({
+                    chatId,
+                    content: completion,
+                    role: "system",
+                });
+            },
+        });
+        return new StreamingTextResponse(stream);
+    } catch (error) { }
 }

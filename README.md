@@ -29,13 +29,19 @@ npm install
 Create a `.env` file and add:
 ```env
 DATABASE_URL=your_neon_database_url
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-GOOGLE_API_KEY=your_google_gen_ai_key
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<your_clerk_publishable_key>
+CLERK_SECRET_KEY=<your_clerk_secret_key>
+GOOGLE_API_KEY=<your_google_gen_ai_key>
 NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
+NEXT_PUBLIC_S3_ACCESS_KEY_ID=<your_s3_access_key_id>
+NEXT_PUBLIC_S3_SECRET_ACCESS_KEY=<your_s3_secret_access_key>
+NEXT_PUBLIC_S3_BUCKET_NAME=<your_s3_bucket_name>
+NEXT_PUBLIC_S3_REGION=<your_s3_region>
+PINECONE_ENVIRONMENT=<your_pinecone_environment>
+PINECONE_API_KEY=<your_pinecone_api_key>
 ```
 
 ### 4. Run the development server
@@ -51,5 +57,3 @@ npm run dev
 - 📈 Get performance feedback and track weak points
 - 📝 Create ATS-optimized resumes and cover letters
 - 📄 Download content summaries and results as PDF
-- 🧪 Form validation powered by Zod
-- 🧵 Background workflows powered by Inngest

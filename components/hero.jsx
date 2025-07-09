@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import FileUpload from "@/components/FileUpload";
 
 const HeroSection = () => {
   const imageRef = useRef(null);
@@ -40,12 +41,13 @@ const HeroSection = () => {
             Upload your PDFs and let Askly summarize key points, answer your questions,
             and quiz you for better retention—personalized learning made simple.
           </p>
-          <div className="flex justify-center md:justify-start space-x-4">
+          <div className="flex justify-center items-center md:justify-start space-x-6">
             <Link href="/dashboard">
               <Button size="lg" className="px-8">
                 Get Started
               </Button>
             </Link>
+            <FileUpload />
           </div>
         </div>
 
