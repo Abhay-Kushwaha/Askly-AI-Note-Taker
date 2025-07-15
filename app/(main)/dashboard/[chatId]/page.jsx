@@ -9,41 +9,41 @@ import { redirect } from "next/navigation";
 import React from "react";
 
 const ChatPage = async ({ params: { chatId } }) => {
-    //     const { userId } = await auth();
-    //     if (!userId) {
-    //         return redirect("/sign-in");
-    //     }
-    //     const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
-    const _chats = [
-        {
-            id: 1,
-            pdfName: "Resume AI Overview.pdf",
-            pdfUrl: "https://cdn.example.com/uploads/resume_ai.pdf",
-            createdAt: new Date("2025-07-04T16:32:00Z"),
-            userId: "user_abc123",
-            fileKey: "resume_ai_2025.pdf"
-        }];
+    const { userId } = await auth();
+    if (!userId) {
+        return redirect("/sign-in");
+    }
+    // const _chats = await db.select().from(chats).where(eq(chats.userId, userId));
+    // const _chats = [
+    //     {
+    //         id: 1,
+    //         pdfName: "Resume AI Overview.pdf",
+    //         pdfUrl: "https://cdn.example.com/uploads/resume_ai.pdf",
+    //         createdAt: new Date("2025-07-04T16:32:00Z"),
+    //         userId: "user_abc123",
+    //         fileKey: "resume_ai_2025.pdf"
+    //     }];
     const isPro = true;
-    //     if (!_chats) {
-    //         return redirect("/");
-    //     }
-    //     if (!_chats.find((chat) => chat.id === parseInt(chatId))) {
-    //         return redirect("/");
-    //     }
+    if (!chats) {
+        return redirect("/");
+    }
+    if (!chats.find((chat) => chat.id === parseInt(chatId))) {
+        return redirect("/");
+    }
 
-    //     const currentChat = _chats.find((chat) => chat.id === parseInt(chatId));
+    const currentChat = chats.find((chat) => chat.id === parseInt(chatId));
 
     return (
         <div className="flex h-screen">
             <div className="flex w-full h-screen overflow-hidden">
                 {/* Chat Sidebar */}
                 <div className="flex-[1] max-w-xs h-full overflow-y-auto border-r border-gray-200">
-                    <ChatSideBar chats={_chats} chatId={parseInt(chatId)} isPro={isPro} />
+                    <ChatSideBar chats={chats} chatId={parseInt(chatId)} isPro={isPro} />
                 </div>
 
                 {/* PDF Viewer */}
                 <div className="flex-[5] h-full bg-white p-4 overflow-y-auto">
-                    {/* <PDFViewer pdf_url={currentChat?.pdfUrl || ""} /> */}
+                    <PDFViewer pdf_url={currentChat?.pdfUrl || ""} />
                 </div>
 
                 {/* Chat Component */}
@@ -52,7 +52,7 @@ const ChatPage = async ({ params: { chatId } }) => {
                 </div>
             </div>
         </div>
-    );      
+    );
 };
 
 export default ChatPage;

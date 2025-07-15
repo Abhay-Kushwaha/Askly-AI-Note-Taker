@@ -1,8 +1,8 @@
-import { db } from "@/lib/db";
+import { db } from "@/lib/index";
 import { chats } from "@/lib/schema";
 import { loadS3IntoPinecone } from "@/lib/pinecone";
 import { getS3Url } from "@/lib/s3";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 // /api/create-chat

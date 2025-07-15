@@ -4,7 +4,6 @@ import {
   PenBox,
   LayoutDashboard,
   FileText,
-  GraduationCap,
   ChevronDown,
   StarsIcon,
   ListChecks,
