@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         <head>
           <link rel="icon" href="/fevi.png" sizes="any" />
         </head>
-        <body className={`${inter.className}`}>
+        <body className={inter.className}>
           <Providers>
             <ThemeProvider
               attribute="class"
