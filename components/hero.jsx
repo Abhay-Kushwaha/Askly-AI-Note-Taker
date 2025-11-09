@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import FileUpload from "@/components/FileUpload";
+import PdfUpload from "../app/(main)/dashboard/_components/PdfUpload";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 const HeroSection = () => {
   const imageRef = useRef(null);
@@ -47,7 +49,10 @@ const HeroSection = () => {
                 Get Started
               </Button>
             </Link>
-            <FileUpload />
+            {/* <FileUpload /> */}
+            <SignedIn>
+              <PdfUpload />
+            </SignedIn>
           </div>
         </div>
 
